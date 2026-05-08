@@ -2,7 +2,7 @@
   "name": "SGF — Base de Données",
   "short_name": "SGF Admin",
   "description": "Application de gestion SGF - SOBEBRA",
-  "start_url": "./sgf_app-1.html",
+  "start_url": "./sgf_system1.html",
   "display": "standalone",
   "background_color": "#1a1714",
   "theme_color": "#1a1714",
