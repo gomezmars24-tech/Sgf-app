@@ -314,6 +314,45 @@ tbody td{padding:9px 13px;vertical-align:middle}
 </head>
 <body>
 
+<!-- PWA INSTALL BANNER -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:700;background:linear-gradient(135deg,#111827,#0a0f1e);border-top:1px solid rgba(249,115,22,.3);padding:14px 20px;animation:slideUp .4s ease">
+  <div style="max-width:480px;margin:0 auto;display:flex;align-items:center;gap:12px">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📊</div>
+    <div style="flex:1">
+      <div style="font-family:Syne,sans-serif;font-size:14px;font-weight:700;color:#e8edf5">Installer SGF System</div>
+      <div style="font-size:12px;color:#4a6080;margin-top:2px">Accès rapide depuis l'écran d'accueil</div>
+    </div>
+    <button id="pwa-install-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">⬇ Installer</button>
+    <button id="pwa-close-btn" style="background:none;border:none;color:#4a6080;cursor:pointer;font-size:22px;line-height:1;padding:4px">×</button>
+  </div>
+</div>
+<style>@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}</style>
+<script>
+var _pwaPrompt=null;
+window.addEventListener("beforeinstallprompt",function(e){
+  e.preventDefault();_pwaPrompt=e;
+  if(!localStorage.getItem("sgf_pwa_ok")){
+    setTimeout(function(){document.getElementById("pwa-banner").style.display="block";},3000);
+  }
+});
+document.addEventListener("DOMContentLoaded",function(){
+  var ib=document.getElementById("pwa-install-btn");
+  var cb=document.getElementById("pwa-close-btn");
+  if(ib)ib.addEventListener("click",function(){
+    if(_pwaPrompt){_pwaPrompt.prompt();_pwaPrompt.userChoice.then(function(r){
+      if(r.outcome==="accepted")document.getElementById("pwa-banner").style.display="none";
+      _pwaPrompt=null;
+    });}else{alert("Sur iPhone/iPad:\n1. Appuie sur Partager\n2. Sur l'ecran d'accueil\n3. Ajouter");}
+  });
+  if(cb)cb.addEventListener("click",function(){
+    document.getElementById("pwa-banner").style.display="none";
+    localStorage.setItem("sgf_pwa_ok","1");
+  });
+});
+window.addEventListener("appinstalled",function(){document.getElementById("pwa-banner").style.display="none";});
+</script>
+
+
 <!-- ═══════════════════════════════════════════════════
      LOGIN PAGE
 ═══════════════════════════════════════════════════ -->
@@ -930,6 +969,12 @@ async function seedIfEmpty(){
 }
 seedIfEmpty();
 
+// ─── COMPTES INTÉGRÉS (toujours disponibles, même sans Firebase) ───
+const BUILTIN_USERS = [
+  {nom:"Administrateur",login:"admin",password:"admin2024",role:"admin",poste:"DG",_docId:"b-admin"},
+  {nom:"Directeur Adjoint",login:"adjoint",password:"adjoint2024",role:"admin",poste:"Adjoint DG",_docId:"b-adjoint"},
+];
+
 // ─── LOGIN ─────────────────────────────────────────
 async function doLogin(){
   const login=document.getElementById("li-user").value.trim().toLowerCase();
@@ -938,17 +983,26 @@ async function doLogin(){
   err.classList.remove("show");
   if(!login||!pass){err.textContent="Remplissez tous les champs";err.classList.add("show");return;}
 
+  // Vérifier comptes intégrés en premier (marche toujours)
+  const builtin=BUILTIN_USERS.find(u=>u.login===login&&u.password===pass);
+  if(builtin){
+    currentUser=builtin;
+    document.getElementById("admin-username").textContent=builtin.nom;
+    showPage("admin");
+    return;
+  }
+
+  // Vérifier comptes Firebase
   try{
     const snap=await getDocs(collection(db,"employes"));
     let found=null;
     snap.forEach(d=>{
       const data=d.data();
-      if((data.login||"").toLowerCase()===login && data.password===pass && data.statut!=="Inactif"){
+      if((data.login||"").toLowerCase()===login&&data.password===pass&&data.statut!=="Inactif"){
         found={...data,_docId:d.id};
       }
     });
     if(!found){err.textContent="Identifiant ou mot de passe incorrect";err.classList.add("show");return;}
-
     currentUser=found;
     const role=found.role||"vendeur";
     if(role==="admin"){
@@ -968,7 +1022,7 @@ async function doLogin(){
       showPage("livreur");
       renderLivreurList();
     }
-  }catch(e){err.textContent="Erreur de connexion: "+e.message;err.classList.add("show");}
+  }catch(e){err.textContent="Erreur Firebase - veuillez reessayer";err.classList.add("show");console.error(e);}
 }
 
 document.getElementById("li-btn").addEventListener("click",doLogin);
