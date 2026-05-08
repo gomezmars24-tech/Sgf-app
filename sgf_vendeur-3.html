@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a6b3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SGF Ventes">
+<title>SGF — Rapport de Vente</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700;800&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Lato',sans-serif;background:#f0fdf4;min-height:100vh;padding-bottom:40px;}
+#ls{position:fixed;inset:0;background:#1a6b3a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99;gap:12px;transition:opacity .4s;}
+#ls.h{opacity:0;pointer-events:none;}
+#ls .lg{font-family:'Bricolage Grotesque',sans-serif;font-size:48px;font-weight:800;color:#fff;}
+.sp{width:28px;height:28px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.header{background:linear-gradient(135deg,#1a6b3a,#166534);color:#fff;padding:22px 20px;text-align:center;}
+.header h1{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;}
+.header p{font-size:13px;opacity:.75;margin-top:4px;}
+.container{max-width:540px;margin:0 auto;padding:16px;}
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px;}
+.card-title{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;color:#1a1714;display:flex;align-items:center;gap:8px;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:13px;}
+.fg:last-child{margin-bottom:0;}
+label{font-size:11px;font-weight:700;color:#5a6a82;text-transform:uppercase;letter-spacing:.8px;}
+input,select,textarea{background:#f5f3ee;border:1.5px solid #ddd9d0;border-radius:8px;padding:11px 13px;font-size:14px;color:#1a1714;font-family:'Lato',sans-serif;outline:none;transition:border-color .2s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:#1a6b3a;background:#fff;}
+textarea{resize:vertical;min-height:70px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+
+/* PRODUITS SELECTION */
+.produits-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.prod-card{border:2px solid #e5e2db;border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;background:#faf9f6;user-select:none;}
+.prod-card:hover{border-color:#86efac;background:#f0fdf4;}
+.prod-card.selected{border-color:#1a6b3a;background:#f0fdf4;}
+.prod-card .prod-nom{font-weight:700;font-size:13px;color:#1a1714;margin-bottom:3px;}
+.prod-card .prod-prix{font-size:11px;color:#5a6a82;}
+.prod-card .prod-check{width:20px;height:20px;border-radius:50%;border:2px solid #ddd9d0;margin-bottom:8px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.prod-card.selected .prod-check{background:#1a6b3a;border-color:#1a6b3a;color:#fff;font-size:12px;}
+.prod-card.selected .prod-check::after{content:'✓';}
+
+/* QUANTITE INPUT qui apparait */
+.qte-area{display:none;margin-top:10px;border-top:1px solid #e5e2db;padding-top:10px;}
+.prod-card.selected .qte-area{display:block;}
+.qte-area label{font-size:10px;color:#166534;font-weight:700;}
+.qte-area input{padding:8px 10px;font-size:14px;border-color:#86efac;background:#fff;}
+.qte-area input:focus{border-color:#1a6b3a;}
+
+/* RECAPITULATIF */
+.recap{background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px;margin-top:6px;}
+.recap-title{font-size:12px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.recap-line{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #dcfce7;}
+.recap-line:last-child{border-bottom:none;}
+.recap-line .rl-nom{color:#1a1714;}
+.recap-line .rl-val{font-weight:700;color:#166534;font-family:'Bricolage Grotesque',sans-serif;}
+.recap-total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:2px solid #86efac;}
+.recap-total .rt-lbl{font-weight:700;color:#166534;font-size:14px;}
+.recap-total .rt-val{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800;color:#166534;}
+
+/* SUBMIT */
+.btn-submit{background:#1a6b3a;color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:700;font-family:'Lato',sans-serif;cursor:pointer;width:100%;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;}
+.btn-submit:hover{background:#155a30;transform:translateY(-1px);}
+.btn-submit:disabled{background:#9ca3af;cursor:not-allowed;transform:none;}
+
+/* SUCCESS */
+.success{display:none;text-align:center;padding:40px 20px;}
+.success.show{display:block;}
+.success .icon{font-size:64px;margin-bottom:14px;}
+.success h2{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;color:#166534;margin-bottom:8px;}
+.success p{color:#5a6a82;font-size:14px;margin-bottom:24px;line-height:1.6;}
+.btn-new{background:#1a6b3a;color:#fff;border:none;border-radius:10px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;}
+
+/* NOTIF */
+.notif{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);background:#1a1714;color:#fff;border-radius:8px;padding:10px 18px;font-size:13px;opacity:0;transition:all .28s ease;white-space:nowrap;z-index:200;}
+.notif.sh{transform:translateX(-50%) translateY(0);opacity:1;}
+
+.aucun-produit{text-align:center;padding:20px;color:#5a6a82;font-size:13px;}
+
+@media(max-width:400px){.produits-grid{grid-template-columns:1fr;}.row2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="ls">
+  <div class="lg">SGF</div>
+  <div class="sp"></div>
+  <p style="color:rgba(255,255,255,.6);font-size:12px;letter-spacing:2px">CHARGEMENT…</p>
+</div>
+
+<div class="header">
+  <h1>📋 Rapport de Vente</h1>
+  <p>Sélectionne les produits vendus et entre les quantités</p>
+</div>
+
+<div class="container">
+  <div id="form-area">
+
+    <!-- INFO VENDEUR -->
+    <div class="card">
+      <div class="card-title">👤 Informations</div>
+      <div class="row2">
+        <div class="fg"><label>Ton Nom *</label><input type="text" id="f-vendeur" placeholder="ex: Koffi"></div>
+        <div class="fg"><label>Date *</label><input type="date" id="f-date"></div>
+      </div>
+      <div class="fg"><label>Nom du Client *</label><input type="text" id="f-client" placeholder="Boutique, bar, restaurant…"></div>
+    </div>
+
+    <!-- SELECTION PRODUITS -->
+    <div class="card">
+      <div class="card-title">🍺 Produits Vendus <span style="font-size:12px;color:#5a6a82;font-weight:400">(sélectionne + quantité)</span></div>
+      <div class="produits-grid" id="produits-grid">
+        <div class="aucun-produit">Chargement des produits…</div>
+      </div>
+    </div>
+
+    <!-- RECAPITULATIF -->
+    <div class="card" id="recap-card" style="display:none">
+      <div class="card-title">🧾 Récapitulatif</div>
+      <div class="recap">
+        <div class="recap-title">Produits sélectionnés</div>
+        <div id="recap-lines"></div>
+        <div class="recap-total">
+          <div class="rt-lbl">TOTAL</div>
+          <div class="rt-val" id="recap-total">0 F</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAIEMENT -->
+    <div class="card">
+      <div class="card-title">💳 Paiement & Note</div>
+      <div class="fg"><label>Mode de Paiement *</label>
+        <select id="f-paiement">
+          <option value="">— Sélectionner —</option>
+          <option>Espèces</option>
+          <option>Mobile Money</option>
+          <option>Crédit</option>
+        </select>
+      </div>
+      <div class="fg"><label>Note (optionnel)</label>
+        <textarea id="f-note" placeholder="Remarques, informations supplémentaires…"></textarea>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitRapport()">
+      📤 Envoyer le Rapport
+    </button>
+
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success" id="success-area">
+    <div class="icon">✅</div>
+    <h2>Rapport envoyé !</h2>
+    <p>Ton rapport a été enregistré.<br>L'administrateur peut le voir immédiatement.</p>
+    <button class="btn-new" onclick="nouveauRapport()">＋ Nouveau Rapport</button>
+  </div>
+</div>
+
+<div class="notif" id="nt"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const FC = {
+  apiKey:"AIzaSyA-hCz5WyNvTNZhmyW57paBAAXA3KPI_DA",
+  authDomain:"sgf-database.firebaseapp.com",
+  projectId:"sgf-database",
+  storageBucket:"sgf-database.firebasestorage.app",
+  messagingSenderId:"948627319178",
+  appId:"1:948627319178:web:b1c91e2977eee15ae0c073"
+};
+
+const app = initializeApp(FC);
+const db = getFirestore(app);
+
+// Produits par défaut si Firebase vide
+const DEFAULT_PRODUITS = [
+  {id:'P001', nom:'Béninoise 65cl x12', prix:6000, cat:'Bière'},
+  {id:'P002', nom:'Béninoise 33cl x24', prix:5500, cat:'Bière'},
+  {id:'P003', nom:'Flag 65cl x12', prix:5800, cat:'Bière'},
+  {id:'P004', nom:'Coca-Cola 50cl x24', prix:7200, cat:'Boisson Sucrée'},
+  {id:'P005', nom:'Sprite 50cl x24', prix:7000, cat:'Boisson Sucrée'},
+  {id:'P006', nom:'Top Ananas x24', prix:4800, cat:'Jus'},
+  {id:'P007', nom:'Top Orange x24', prix:4800, cat:'Jus'},
+  {id:'P008', nom:'Guinness 63cl x12', prix:7500, cat:'Bière'},
+];
+
+let produits = [];
+const selection = {}; // {id: {produit, quantite}}
+
+const EMOJI = {'Bière':'🍺', 'Boisson Sucrée':'🥤', 'Jus':'🧃', 'Eau':'💧'};
+
+async function loadProduits() {
+  try {
+    const snap = await getDocs(collection(db, 'produits'));
+    if (snap.docs.length > 0) {
+      produits = snap.docs.map(d => {
+        const data = d.data();
+        return {id: data.id_produit || d.id, nom: data.nom || '?', prix: Number(data.prix_unit)||0, cat: data.categorie||''};
+      });
+    } else {
+      produits = DEFAULT_PRODUITS;
+    }
+  } catch(e) {
+    produits = DEFAULT_PRODUITS;
+  }
+  renderProduits();
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('ls').classList.add('h');
+}
+
+function renderProduits() {
+  const grid = document.getElementById('produits-grid');
+  if (!produits.length) { grid.innerHTML = '<div class="aucun-produit">Aucun produit disponible</div>'; return; }
+  grid.innerHTML = produits.map(p => `
+    <div class="prod-card" id="pc-${p.id}" onclick="toggleProduit('${p.id}')">
+      <div class="prod-check"></div>
+      <div class="prod-nom">${EMOJI[p.cat]||'📦'} ${p.nom}</div>
+      <div class="prod-prix">${Number(p.prix).toLocaleString('fr-FR')} FCFA</div>
+      <div class="qte-area" onclick="event.stopPropagation()">
+        <label>Quantité (casiers/packs)</label>
+        <input type="number" id="qte-${p.id}" min="1" value="1"
+          oninput="updateQte('${p.id}', this.value)" placeholder="1">
+      </div>
+    </div>
+  `).join('');
+}
+
+window.toggleProduit = function(id) {
+  const card = document.getElementById('pc-' + id);
+  if (!card) return;
+  const p = produits.find(x => x.id === id);
+  if (!p) return;
+
+  if (selection[id]) {
+    // Désélectionner
+    delete selection[id];
+    card.classList.remove('selected');
+  } else {
+    // Sélectionner
+    const qteEl = document.getElementById('qte-' + id);
+    const qte = Number(qteEl ? qteEl.value : 1) || 1;
+    selection[id] = {produit: p, quantite: qte};
+    card.classList.add('selected');
+    // Focus sur le champ quantité
+    setTimeout(() => { if(qteEl) qteEl.focus(); }, 100);
+  }
+  updateRecap();
+};
+
+window.updateQte = function(id, val) {
+  const qte = Math.max(1, Number(val) || 1);
+  if (selection[id]) {
+    selection[id].quantite = qte;
+    updateRecap();
+  }
+};
+
+function updateRecap() {
+  const ids = Object.keys(selection);
+  const recapCard = document.getElementById('recap-card');
+  if (!ids.length) { recapCard.style.display = 'none'; return; }
+  recapCard.style.display = 'block';
+
+  let total = 0;
+  const lines = ids.map(id => {
+    const s = selection[id];
+    const subtotal = s.quantite * s.produit.prix;
+    total += subtotal;
+    return `<div class="recap-line">
+      <span class="rl-nom">${s.produit.nom} × ${s.quantite}</span>
+      <span class="rl-val">${subtotal.toLocaleString('fr-FR')} F</span>
+    </div>`;
+  });
+
+  document.getElementById('recap-lines').innerHTML = lines.join('');
+  document.getElementById('recap-total').textContent = total.toLocaleString('fr-FR') + ' F';
+}
+
+window.submitRapport = async function() {
+  const vendeur = (document.getElementById('f-vendeur').value||'').trim();
+  const date = document.getElementById('f-date').value;
+  const client = (document.getElementById('f-client').value||'').trim();
+  const paiement = document.getElementById('f-paiement').value;
+  const note = (document.getElementById('f-note').value||'').trim();
+
+  if (!vendeur) { notify('⚠️ Entre ton nom'); document.getElementById('f-vendeur').focus(); return; }
+  if (!client) { notify('⚠️ Entre le nom du client'); document.getElementById('f-client').focus(); return; }
+  if (!Object.keys(selection).length) { notify('⚠️ Sélectionne au moins un produit'); return; }
+  if (!paiement) { notify('⚠️ Sélectionne le mode de paiement'); return; }
+
+  // Lire les quantités actuelles depuis les inputs
+  Object.keys(selection).forEach(id => {
+    const el = document.getElementById('qte-' + id);
+    if (el) selection[id].quantite = Math.max(1, Number(el.value)||1);
+  });
+
+  const produits_vendus = Object.values(selection).map(s => ({
+    id: s.produit.id, nom: s.produit.nom, prix: s.produit.prix, quantite: s.quantite, subtotal: s.quantite * s.produit.prix
+  }));
+  const montant_total = produits_vendus.reduce((s,p) => s + p.subtotal, 0);
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = '⏳ Envoi en cours…';
+
+  try {
+    const d = new Date(date);
+    await addDoc(collection(db, 'rapports'), {
+      vendeur, date, date_str: d.toLocaleDateString('fr-FR'),
+      client, produits_vendus,
+      produit: produits_vendus.map(p => p.nom).join(', '),
+      quantite: produits_vendus.reduce((s,p) => s+p.quantite, 0),
+      montant: montant_total, paiement, note,
+      statut: 'en_attente',
+      created_at: new Date().toISOString()
+    });
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('success-area').classList.add('show');
+  } catch(e) {
+    notify('❌ Erreur: ' + e.message);
+    btn.disabled = false; btn.textContent = '📤 Envoyer le Rapport';
+  }
+};
+
+window.nouveauRapport = function() {
+  Object.keys(selection).forEach(id => {
+    delete selection[id];
+    const c = document.getElementById('pc-' + id);
+    if (c) c.classList.remove('selected');
+  });
+  document.getElementById('form-area').style.display = 'block';
+  document.getElementById('success-area').classList.remove('show');
+  document.getElementById('f-vendeur').value = '';
+  document.getElementById('f-client').value = '';
+  document.getElementById('f-paiement').value = '';
+  document.getElementById('f-note').value = '';
+  document.getElementById('recap-card').style.display = 'none';
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = false; btn.textContent = '📤 Envoyer le Rapport';
+};
+
+let ntT = null;
+function notify(msg) {
+  const el = document.getElementById('nt');
+  el.textContent = msg; el.classList.add('sh');
+  clearTimeout(ntT); ntT = setTimeout(() => el.classList.remove('sh'), 3000);
+}
+
+loadProduits();
+</script>
+</body>
+</html>
