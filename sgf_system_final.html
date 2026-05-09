@@ -3,11 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a0f1e">
+<meta name="theme-color" content="#ff6b00">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SGF System">
-<link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./icon-192x192.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SGF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="SGF">
+<script>
+(function(){
+  var svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="38" fill="#05080f"/><defs><linearGradient id="gt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff6b00"/><stop offset="100%" stop-color="#ffbe00"/></linearGradient></defs><text x="96" y="128" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="80" font-weight="900" fill="url(#gt)">SGF</text></svg>';
+  var icon192 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgIcon)));
+  var svgIcon72 = svgIcon.replace('width="192" height="192"','width="72" height="72"');
+  var icon72 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgIcon72)));
+  window._SGF_ICON_192 = icon192;
+  window._SGF_ICON_72  = icon72;
+  var manifest = {
+    name:"SGF \u2014 Syst\u00e8me de Gestion",
+    short_name:"SGF",
+    description:"Syst\u00e8me de Gestion et de Facturation",
+    start_url:"./",scope:"./",
+    display:"standalone",
+    orientation:"portrait-primary",
+    background_color:"#05080f",
+    theme_color:"#ff6b00",
+    icons:[
+      {src:icon72,  sizes:"72x72",   type:"image/svg+xml",purpose:"any maskable"},
+      {src:icon192, sizes:"192x192", type:"image/svg+xml",purpose:"any maskable"},
+      {src:icon192, sizes:"512x512", type:"image/svg+xml",purpose:"any maskable"}
+    ]
+  };
+  try {
+    var mblob = new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"});
+    var murl  = URL.createObjectURL(mblob);
+    var lm = document.createElement("link"); lm.rel="manifest"; lm.href=murl; document.head.appendChild(lm);
+  } catch(e) {
+    var lm2 = document.createElement("link"); lm2.rel="manifest";
+    lm2.href="data:application/manifest+json,"+encodeURIComponent(JSON.stringify(manifest));
+    document.head.appendChild(lm2);
+  }
+  var la = document.createElement("link"); la.rel="apple-touch-icon"; la.href=icon192; document.head.appendChild(la);
+  var lf = document.createElement("link"); lf.rel="icon"; lf.type="image/svg+xml"; lf.href=icon192; document.head.appendChild(lf);
+})();
+</script>
 <title>SGF — Système de Gestion</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -22,13 +59,13 @@
   --or2:#e05a00;--gr2:#00b870;--bl2:#2d85ff;
 }
 html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--ink);overflow:hidden}
-
+ 
 /* ============================================================
    PAGES SYSTEM
 ============================================================ */
 .page{display:none;position:fixed;inset:0;overflow:hidden}
 .page.active{display:flex;flex-direction:column}
-
+ 
 /* ============================================================
    LOGIN PAGE
 ============================================================ */
@@ -49,12 +86,12 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--bg);colo
 .login-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:8px;padding:10px 14px;font-size:13px;text-align:center;margin-top:12px;display:none}
 .login-err.show{display:block}
 .login-fire{text-align:center;margin-top:20px;font-family:"DM Mono",monospace;font-size:10px;color:var(--mu)}
-
+ 
 /* ============================================================
    APP SHELL (shared layout)
 ============================================================ */
 .app-shell{display:flex;flex-direction:column;height:100%}
-
+ 
 /* TOPBAR */
 .topbar{background:rgba(15,22,41,.98);border-bottom:1px solid var(--br);padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .tb-left{display:flex;align-items:center;gap:12px}
@@ -73,7 +110,7 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--bg);colo
 .notif-badge.show{display:flex}
 .logout-btn{background:transparent;border:1px solid var(--br);color:var(--mu);border-radius:8px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all .2s}
 .logout-btn:hover{border-color:var(--rd);color:var(--rd)}
-
+ 
 /* NAV TABS (for admin) */
 .nav-tabs{background:var(--s1);border-bottom:1px solid var(--br);display:flex;gap:2px;padding:0 16px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
 .nav-tabs::-webkit-scrollbar{display:none}
@@ -83,16 +120,16 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--bg);colo
 .nav-tab .tab-badge{font-family:"DM Mono",monospace;font-size:10px;background:rgba(249,115,22,.15);color:#f97316;padding:1px 6px;border-radius:8px}
 .nav-tab .tab-badge.new{background:rgba(234,179,8,.15);color:#eab308;animation:glow 2s infinite}
 @keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 6px rgba(234,179,8,.4)}}
-
+ 
 /* CONTENT */
 .content-area{flex:1;overflow-y:auto;padding:20px}
 .tab-content{display:none}.tab-content.active{display:block;animation:fadeUp .25s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
+ 
 /* ============================================================
    COMPONENTS
 ============================================================ */
-
+ 
 /* KPI */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px}
 .kpi{background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:transform .2s}
@@ -107,17 +144,17 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--bg);colo
 .kpi-val{font-family:"Syne",sans-serif;font-size:30px;font-weight:800;line-height:1;letter-spacing:-1px}
 .ko .kpi-val{color:#ff6b00}.kg .kpi-val{color:#00d084}.kb .kpi-val{color:#4d9fff}.ky .kpi-val{color:#ffbe00}
 .kpi-sub{font-size:12px;color:var(--mu);margin-top:6px;font-weight:500}
-
+ 
 /* SECTION HEADER */
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .sec-ttl{font-family:"Syne",sans-serif;font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
 .sec-ttl small{font-family:"DM Mono",monospace;font-size:9px;background:var(--s2);border:1px solid var(--br);color:var(--mu);padding:2px 7px;border-radius:4px;font-weight:400}
-
+ 
 /* CARDS */
 .card{background:var(--s1);border:1px solid var(--br);border-radius:14px;overflow:hidden;margin-bottom:16px}
 .card-hd{background:rgba(255,255,255,.01);border-bottom:1px solid var(--br);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .card-ttl{font-family:"Syne",sans-serif;font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px}
-
+ 
 /* TABLE */
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -130,7 +167,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .pk{font-family:"DM Mono",monospace;font-size:11px;color:#f97316;font-weight:600}
 .fk{font-family:"DM Mono",monospace;font-size:11px;color:#60a5fa;font-weight:600}
 .ep{padding:36px;text-align:center;color:var(--mu);font-size:13px}
-
+ 
 /* BADGES */
 .bdg{display:inline-flex;align-items:center;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;font-family:"DM Mono",monospace;white-space:nowrap}
 .bg{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.15)}
@@ -139,12 +176,12 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .br2{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15)}
 .by{background:rgba(234,179,8,.1);color:#eab308;border:1px solid rgba(234,179,8,.15)}
 .bp{background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.15)}
-
+ 
 /* STOCK BAR */
 .stkb{display:flex;align-items:center;gap:7px}
 .stkb-t{width:52px;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;flex-shrink:0}
 .stkb-f{height:100%;border-radius:2px;transition:width .5s}
-
+ 
 /* BUTTONS */
 .btn{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;font-family:"DM Sans",sans-serif;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-p{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;box-shadow:0 4px 14px rgba(249,115,22,.2)}
@@ -160,7 +197,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .btn-val{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#22c55e;font-size:11px;padding:5px 10px;cursor:pointer;font-weight:600;border-radius:6px;font-family:"DM Sans",sans-serif}
 .btn-val:hover{background:rgba(34,197,94,.18)}
 .td-act{display:flex;gap:4px;align-items:center}
-
+ 
 /* FORM */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-grid.full{grid-template-columns:1fr}
@@ -173,7 +210,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .finput:focus,.fsel:focus,.ftx:focus{border-color:var(--or);background:var(--s3);box-shadow:0 0 0 3px rgba(249,115,22,.06)}
 .finput.err{border-color:var(--rd)!important}
 .ftx{resize:vertical;min-height:70px}
-
+ 
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:500;align-items:center;justify-content:center;padding:16px}
 .overlay.open{display:flex}
@@ -185,22 +222,22 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .modal-x:hover{color:var(--ink)}
 .modal-body{padding:20px}
 .modal-ft{padding:14px 20px;border-top:1px solid var(--br);display:flex;justify-content:flex-end;gap:8px}
-
+ 
 /* NOTIF TOAST */
 #toast{position:fixed;bottom:20px;right:20px;background:var(--s1);border:1px solid var(--br);color:var(--ink);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:500;z-index:999;transform:translateY(60px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;max-width:320px;box-shadow:0 12px 32px rgba(0,0,0,.6);pointer-events:none}
 #toast.show{transform:translateY(0);opacity:1}
-
+ 
 /* ============================================================
    VENDEUR PAGE
 ============================================================ */
 #page-vendeur{background:var(--bg)}
 .vd-shell{display:flex;flex-direction:column;height:100%}
 .vd-content{flex:1;overflow-y:auto;padding:16px}
-
+ 
 /* VENTE FORM */
 .vente-card{background:var(--s1);border:1px solid var(--br);border-radius:16px;padding:20px;margin-bottom:14px}
 .vente-card-ttl{font-family:"Syne",sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-
+ 
 /* CLIENT AUTOCOMPLETE */
 .cli-wrap{position:relative}
 .cli-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--s2);border:1.5px solid var(--or);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:100;max-height:200px;overflow-y:auto;display:none}
@@ -210,7 +247,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .cli-opt:hover{background:rgba(249,115,22,.08)}
 .cli-opt-new{color:#f97316;font-weight:600}
 .cli-opt-new-ico{font-size:16px}
-
+ 
 /* PRODUITS GRID */
 .prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
 .prod-tile{border:2px solid var(--br);border-radius:12px;padding:14px;cursor:pointer;transition:all .22s;background:var(--s2);user-select:none;position:relative}
@@ -227,7 +264,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .cat-sucre{background:rgba(239,68,68,.1);color:#f87171}
 .cat-jus{background:rgba(34,197,94,.1);color:#22c55e}
 .cat-eau{background:rgba(59,130,246,.1);color:#60a5fa}
-
+ 
 /* QTE CONTROL */
 .qte-area{display:none;margin-top:11px;padding-top:11px;border-top:1px dashed rgba(249,115,22,.25)}
 .prod-tile.selected .qte-area{display:block}
@@ -236,7 +273,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .qte-btn:hover{background:var(--or);color:#fff;border-color:var(--or)}
 .qte-inp{flex:1;text-align:center;font-family:"DM Mono",monospace;font-size:15px;font-weight:700;color:var(--ink);padding:5px;border:1.5px solid rgba(249,115,22,.25);border-radius:7px;background:rgba(255,255,255,.03);outline:none}
 .qte-inp:focus{border-color:var(--or)}
-
+ 
 /* RECAP */
 .recap-box{background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(34,197,94,.03));border:1px solid rgba(34,197,94,.18);border-radius:14px;padding:18px}
 .recap-ttl{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:2px;color:var(--mu);text-transform:uppercase;margin-bottom:12px}
@@ -247,7 +284,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .recap-total-row{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:2px solid rgba(34,197,94,.2)}
 .recap-total-lbl{font-weight:600;color:var(--mu);font-size:13px}
 .recap-total-val{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;color:#22c55e}
-
+ 
 /* ============================================================
    STOCK PAGE
 ============================================================ */
@@ -263,7 +300,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .stock-prix-inp{width:110px;font-family:"DM Mono",monospace;font-size:12px;color:var(--ink);padding:7px;border:1.5px solid var(--br);border-radius:8px;background:var(--s3);outline:none;transition:all .2s}
 .stock-prix-inp:focus{border-color:var(--bl)}
 .stock-inp-lbl{font-family:"DM Mono",monospace;font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-
+ 
 /* ============================================================
    LIVREUR PAGE
 ============================================================ */
@@ -273,7 +310,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .liv-ttl{font-weight:700;font-size:14px;color:var(--ink)}
 .liv-sub{font-size:12px;color:var(--mu);margin-top:3px}
 .liv-body{font-size:13px;color:rgba(255,255,255,.7);line-height:1.6}
-
+ 
 /* ============================================================
    ADMIN COMMANDES VIEW
 ============================================================ */
@@ -296,7 +333,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .cmd-total-val{font-family:"Syne",sans-serif;font-size:20px;font-weight:800;color:#22c55e}
 .cmd-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
 .cmd-note{font-size:11px;color:var(--mu);margin-top:8px;padding:6px 9px;background:rgba(255,255,255,.02);border-radius:6px;border:1px solid rgba(255,255,255,.04)}
-
+ 
 /* ============================================================
    RESPONSIVE
 ============================================================ */
@@ -311,7 +348,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
   .topbar{padding:0 13px}
 }
 @media(max-width:380px){.prod-grid{grid-template-columns:1fr}}
-
+ 
 /* ── NOTIFICATION PANEL ── */
 .notif-panel{position:fixed;top:58px;right:0;width:340px;max-height:calc(100vh - 58px);background:var(--s1);border-left:1px solid var(--br);z-index:400;transform:translateX(100%);transition:transform .3s ease;display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.5)}
 .notif-panel.open{transform:translateX(0)}
@@ -329,25 +366,25 @@ tbody td{padding:9px 13px;vertical-align:middle}
 .notif-item-msg{font-size:13px;color:var(--ink);font-weight:500;margin-bottom:3px}
 .notif-item-time{font-family:"DM Mono",monospace;font-size:10px;color:var(--mu)}
 @keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-
+ 
 /* ── STOCK VALIDATION ── */
 .stk-val-card{background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:16px;margin-bottom:12px;transition:all .22s;position:relative;overflow:hidden}
 .stk-val-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--bl)}
 .stk-val-card.validee::before{background:var(--gr)}
 .stk-val-card:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
-
+ 
 /* ── BÉNÉFICE DISPLAY ── */
 .benef-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,208,132,.05);border:1px solid rgba(0,208,132,.15);border-radius:8px;margin-top:8px}
 .benef-lbl{font-size:12px;color:var(--mu)}
 .benef-val{font-family:"Syne",sans-serif;font-size:18px;font-weight:800;color:#00d084}
-
+ 
 /* ── IMPROVED TOPBAR ── */
 .tb-logo{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#ff6b00,#ffbe00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px}
-
+ 
 </style>
 </head>
 <body>
-
+ 
 <!-- ══════════════════════════════════════════
      PWA INSTALL BANNER (apparaît automatiquement)
 ══════════════════════════════════════════ -->
@@ -361,7 +398,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
   box-shadow:0 -8px 40px rgba(255,107,0,.15)">
   <div style="max-width:520px;margin:0 auto;display:flex;align-items:center;gap:14px">
     <!-- ICON -->
-    <div style="width:52px;height:52px;flex-shrink:0;border-radius:14px;background:linear-gradient(135deg,#ff6b00,#ffbe00);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 16px rgba(255,107,0,.3)">📊</div>
+    <div style="width:52px;height:52px;flex-shrink:0;border-radius:14px;background:linear-gradient(135deg,#ff6b00,#ffbe00);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;font-family:Arial Black,sans-serif;color:#fff;box-shadow:0 4px 16px rgba(255,107,0,.3)">SGF</div>
     <!-- TEXT -->
     <div style="flex:1;min-width:0">
       <div style="font-family:Syne,sans-serif;font-size:15px;font-weight:800;color:#f0f6ff;white-space:nowrap">Installer SGF sur votre appareil</div>
@@ -390,26 +427,26 @@ tbody td{padding:9px 13px;vertical-align:middle}
     📱 Sur iPhone/iPad : appuie sur <strong>Partager</strong> 📤 puis <strong>"Sur l'écran d'accueil"</strong>
   </div>
 </div>
-
+ 
 <style>
 @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
 #pwa-install-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,107,0,.4)!important}
 </style>
-
+ 
 <script>
 (function(){
   var _prompt = null;
   var _dismissed = localStorage.getItem("sgf_pwa_dismissed");
   var _installed = localStorage.getItem("sgf_pwa_installed");
-
+ 
   // Detect iOS
   var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   var isStandalone = window.navigator.standalone === true ||
     window.matchMedia("(display-mode: standalone)").matches;
-
+ 
   // Don't show if already installed or dismissed recently
   if(_installed || isStandalone) return;
-
+ 
   window.addEventListener("beforeinstallprompt", function(e){
     e.preventDefault();
     _prompt = e;
@@ -419,7 +456,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
       }, 2500);
     }
   });
-
+ 
   // On iOS, show after delay if not standalone
   if(isIOS && !isStandalone && !_dismissed){
     setTimeout(function(){
@@ -431,11 +468,11 @@ tbody td{padding:9px 13px;vertical-align:middle}
       if(installBtn) installBtn.style.display = "none";
     }, 3000);
   }
-
+ 
   window.addEventListener("DOMContentLoaded", function(){
     var installBtn = document.getElementById("pwa-install-btn");
     var closeBtn = document.getElementById("pwa-close-btn");
-
+ 
     if(installBtn) installBtn.addEventListener("click", function(){
       if(_prompt){
         _prompt.prompt();
@@ -448,7 +485,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
         });
       }
     });
-
+ 
     if(closeBtn) closeBtn.addEventListener("click", function(){
       document.getElementById("pwa-banner").style.display = "none";
       localStorage.setItem("sgf_pwa_dismissed", "1");
@@ -458,7 +495,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
       }, 3 * 24 * 60 * 60 * 1000);
     });
   });
-
+ 
   window.addEventListener("appinstalled", function(){
     document.getElementById("pwa-banner").style.display = "none";
     localStorage.setItem("sgf_pwa_installed", "1");
@@ -469,12 +506,12 @@ tbody td{padding:9px 13px;vertical-align:middle}
   });
 })();
 </script>
-
-
+ 
+ 
 <!-- ═══════════════════════════════════════════════════
      LOGIN PAGE
 ═══════════════════════════════════════════════════ -->
-
+ 
 <!-- NOTIFICATION PANEL -->
 <div class="notif-panel" id="notif-panel">
   <div class="notif-panel-hd">
@@ -485,7 +522,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
     <div style="padding:30px;text-align:center;color:var(--mu);font-size:13px">Aucune notification</div>
   </div>
 </div>
-
+ 
 <div id="page-login" class="page active">
   <div class="login-box">
     <div class="login-logo">SGF</div>
@@ -503,7 +540,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
     <div class="login-fire">🔥 Propulsé par Firebase</div>
   </div>
 </div>
-
+ 
 <!-- ═══════════════════════════════════════════════════
      ADMIN PAGE
 ═══════════════════════════════════════════════════ -->
@@ -531,7 +568,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
       <div class="nav-tab" data-tab="livraisons">🚚 Livraisons</div>
     </div>
     <div class="content-area">
-
+ 
       <!-- DASHBOARD -->
       <div class="tab-content active" id="tab-dashboard">
         <div class="kpi-row" id="admin-kpis"></div>
@@ -558,7 +595,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
           </div>
         </div>
       </div>
-
+ 
       <!-- COMMANDES -->
       <div class="tab-content" id="tab-commandes">
         <div class="sec-hd">
@@ -571,7 +608,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
         </div>
         <div id="commandes-list"></div>
       </div>
-
+ 
       <!-- PRODUITS -->
       <div class="tab-content" id="tab-produits">
         <div class="sec-hd">
@@ -587,7 +624,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
           </div>
         </div>
       </div>
-
+ 
       <!-- STOCKS (entrées + validation) -->
       <div class="tab-content" id="tab-stocks">
         <div class="sec-hd">
@@ -612,7 +649,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
           </div>
         </div>
       </div>
-
+ 
       <!-- CLIENTS -->
       <div class="tab-content" id="tab-clients">
         <div class="sec-hd">
@@ -628,7 +665,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
           </div>
         </div>
       </div>
-
+ 
       <!-- EMPLOYES -->
       <div class="tab-content" id="tab-employes">
         <div class="sec-hd">
@@ -644,7 +681,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
           </div>
         </div>
       </div>
-
+ 
       <!-- LIVRAISONS -->
       <div class="tab-content" id="tab-livraisons">
         <div class="sec-hd">
@@ -652,11 +689,11 @@ tbody td{padding:9px 13px;vertical-align:middle}
         </div>
         <div id="livraisons-list"></div>
       </div>
-
+ 
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══════════════════════════════════════════════════
      VENDEUR PAGE
 ═══════════════════════════════════════════════════ -->
@@ -675,7 +712,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
     </div>
     <div class="vd-content">
       <div style="max-width:700px;margin:0 auto">
-
+ 
         <!-- SUCCESS STATE -->
         <div id="vd-success" style="display:none;text-align:center;padding:50px 20px">
           <div style="font-size:64px;margin-bottom:16px;animation:bounceIn .5s ease">✅</div>
@@ -683,7 +720,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
           <div style="font-size:14px;color:var(--mu);margin-bottom:24px;line-height:1.7">L'administrateur va valider votre commande.<br>Le stock sera mis à jour automatiquement.</div>
           <button class="btn btn-g" id="vd-new-cmd">+ Nouvelle commande</button>
         </div>
-
+ 
         <!-- FORM STATE -->
         <div id="vd-form">
           <!-- CLIENT -->
@@ -698,13 +735,13 @@ tbody td{padding:9px 13px;vertical-align:middle}
               <div id="vd-client-info" style="font-family:DM Mono,monospace;font-size:11px;color:#22c55e;margin-top:4px;display:none"></div>
             </div>
           </div>
-
+ 
           <!-- PRODUITS -->
           <div class="vente-card">
             <div class="vente-card-ttl">🍺 Produits vendus <span style="font-size:12px;color:var(--mu);font-weight:400"> — sélectionne et entre la quantité</span></div>
             <div class="prod-grid" id="vd-prod-grid"></div>
           </div>
-
+ 
           <!-- RECAP -->
           <div id="vd-recap-card" style="display:none;margin-bottom:14px">
             <div class="recap-box">
@@ -716,7 +753,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
               </div>
             </div>
           </div>
-
+ 
           <!-- PAIEMENT -->
           <div class="vente-card">
             <div class="vente-card-ttl">💳 Paiement & Note</div>
@@ -738,12 +775,12 @@ tbody td{padding:9px 13px;vertical-align:middle}
             <button class="btn btn-g" style="width:100%;justify-content:center;padding:14px;font-size:15px" id="vd-submit">📤 Envoyer la commande</button>
           </div>
         </div>
-
+ 
       </div>
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══════════════════════════════════════════════════
      STOCK PAGE
 ═══════════════════════════════════════════════════ -->
@@ -762,14 +799,14 @@ tbody td{padding:9px 13px;vertical-align:middle}
     </div>
     <div class="content-area">
       <div style="max-width:720px;margin:0 auto">
-
+ 
         <div id="stk-success" style="display:none;text-align:center;padding:40px">
           <div style="font-size:56px;margin-bottom:12px">✅</div>
           <div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Entrée stock enregistrée !</div>
           <div style="font-size:13px;color:var(--mu);margin-bottom:20px">Les stocks ont été mis à jour automatiquement.</div>
           <button class="btn btn-b" id="stk-new">+ Nouvelle entrée</button>
         </div>
-
+ 
         <div id="stk-form">
           <div class="sec-hd">
             <div class="sec-ttl">📦 Entrée Stock <small>CASIERS</small></div>
@@ -793,12 +830,12 @@ tbody td{padding:9px 13px;vertical-align:middle}
             <button class="btn btn-b" style="width:100%;justify-content:center;padding:14px;font-size:15px" id="stk-submit">📦 Enregistrer l'entrée stock</button>
           </div>
         </div>
-
+ 
       </div>
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══════════════════════════════════════════════════
      LIVREUR PAGE
 ═══════════════════════════════════════════════════ -->
@@ -826,11 +863,11 @@ tbody td{padding:9px 13px;vertical-align:middle}
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══════════════════════════════════════════════════
      MODALS
 ═══════════════════════════════════════════════════ -->
-
+ 
 <!-- Modal produit -->
 <div class="overlay" id="modal-prod">
   <div class="modal">
@@ -863,7 +900,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
     </div>
   </div>
 </div>
-
+ 
 <!-- Modal client -->
 <div class="overlay" id="modal-cli">
   <div class="modal">
@@ -888,7 +925,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
     </div>
   </div>
 </div>
-
+ 
 <!-- Modal employé -->
 <div class="overlay" id="modal-emp">
   <div class="modal">
@@ -926,7 +963,7 @@ tbody td{padding:9px 13px;vertical-align:middle}
     </div>
   </div>
 </div>
-
+ 
 <!-- Modal livraison (livreur) -->
 <div class="overlay" id="modal-liv">
   <div class="modal">
@@ -949,10 +986,10 @@ tbody td{padding:9px 13px;vertical-align:middle}
     </div>
   </div>
 </div>
-
+ 
 <!-- TOAST -->
 <div id="toast"></div>
-
+ 
 <!-- ═══════════════════════════════════════════════════
      FIREBASE + LOGIC
 ═══════════════════════════════════════════════════ -->
@@ -963,7 +1000,7 @@ import {
   addDoc, setDoc, updateDoc, deleteDoc,
   onSnapshot, getDocs, getDoc, query, orderBy, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
+ 
 // ─── FIREBASE CONFIG ───────────────────────────────
 const FB = {
   apiKey:"AIzaSyA-hCz5WyNvTNZhmyW57paBAAXA3KPI_DA",
@@ -975,7 +1012,7 @@ const FB = {
 };
 const fapp = initializeApp(FB);
 const db = getFirestore(fapp);
-
+ 
 // ─── STATE ─────────────────────────────────────────
 let currentUser = null; // {nom, role, login, docId}
 const cache = {
@@ -987,26 +1024,26 @@ let vdClientId = null;
 let vdClientNom = "";
 let cmdFilter = "tous";
 let editDocId = { prod:null, cli:null, emp:null };
-
+ 
 // ─── DEFAULT USERS (seeded on first run) ───────────
 const DEFAULT_USERS = [
   {nom:"Administrateur",login:"admin",password:"admin2024",role:"admin",poste:"Directeur Général",salaire:0,telephone:"",statut:"Actif"},
   {nom:"Adjoint DG",login:"adjoint",password:"adjoint2024",role:"admin",poste:"Directeur Adjoint",salaire:0,telephone:"",statut:"Actif"},
 ];
-
+ 
 // ─── HELPERS ───────────────────────────────────────
 function esc(s){return s==null?"":String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 function fmt(n){const v=Number(n);return isNaN(v)?"0":v.toLocaleString("fr-FR");}
 function now(){return new Date().toLocaleDateString("fr-FR");}
 function nowFull(){return new Date().toLocaleString("fr-FR");}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,4);}
-
+ 
 function toast(msg,dur=3000){
   const el=document.getElementById("toast");
   el.textContent=msg;el.classList.add("show");
   clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur);
 }
-
+ 
 function bdg(t){
   const m={
     "Actif":"bg","Livré":"bg","Validée":"bg","Espèces":"bg",
@@ -1020,14 +1057,14 @@ function bdg(t){
   if(!t)return'<span class="bdg bb">—</span>';
   return'<span class="bdg '+(m[t]||"bb")+'">'+esc(t)+'</span>';
 }
-
+ 
 function stkBar(q,mn){
   q=Number(q)||0;mn=Number(mn)||1;
   const p=Math.min(100,Math.round(q/(mn*5)*100));
   const c=q<=mn?"#ef4444":q<=mn*2?"#f97316":"#22c55e";
   return'<div class="stkb"><div class="stkb-t"><div class="stkb-f" style="width:'+p+'%;background:'+c+'"></div></div>'+q+'</div>';
 }
-
+ 
 function catClass(cat){
   const m={Bière:"cat-biere","Boisson Sucrée":"cat-sucre",Jus:"cat-jus",Eau:"cat-eau"};
   return m[cat]||"cat-eau";
@@ -1036,38 +1073,38 @@ function catIco(cat){
   const m={Bière:"🍺","Boisson Sucrée":"🥤",Jus:"🧃",Eau:"💧"};
   return m[cat]||"📦";
 }
-
+ 
 function roleLabel(r){
   const m={admin:"👑 Admin",vendeur:"💰 Vendeur",stock:"📦 Stock",livreur:"🚚 Livreur"};
   return m[r]||r;
 }
-
+ 
 function showPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById("page-"+id).classList.add("active");
 }
-
+ 
 function cmdTot(id){
   const cmd=cache.commandes.find(c=>c._docId===id);
   if(!cmd||!cmd.lignes)return 0;
   return cmd.lignes.reduce((s,l)=>s+(Number(l.quantite)||0)*(Number(l.prix_unit)||0),0);
 }
-
+ 
 function cliCmds(nom){
   return cache.commandes.filter(c=>c.client_nom===nom).length;
 }
-
+ 
 // ─── MODALS ────────────────────────────────────────
 function openModal(id){document.getElementById("modal-"+id).classList.add("open");}
 function closeModal(id){document.getElementById("modal-"+id).classList.remove("open");}
-
+ 
 document.querySelectorAll("[data-close]").forEach(btn=>{
   btn.addEventListener("click",()=>closeModal(btn.dataset.close));
 });
 document.querySelectorAll(".overlay").forEach(ov=>{
   ov.addEventListener("click",e=>{if(e.target===ov)closeModal(ov.id.replace("modal-",""));});
 });
-
+ 
 // ─── FIREBASE LISTENERS ────────────────────────────
 function listen(col,cacheKey,cb){
   return onSnapshot(collection(db,col),(snap)=>{
@@ -1075,11 +1112,11 @@ function listen(col,cacheKey,cb){
     if(cb)cb(snap);
   },err=>console.error(col,err));
 }
-
+ 
 // Track already-seen docs to avoid false "new" notifications on first load
 const seen = {commandes:new Set(), stocks:new Set(), livraisons:new Set()};
 let initialLoad = {commandes:true, stocks:true, livraisons:true};
-
+ 
 listen("produits","produits",()=>{renderAdmin();renderVendeurGrid();renderStockForm();});
 listen("clients","clients",()=>renderAdmin());
 listen("employes","employes",()=>renderAdmin());
@@ -1130,11 +1167,11 @@ listen("livraisons","livraisons",(snap)=>{
   }
   renderAdmin();renderLivreurList();
 });
-
+ 
 // ─── NOTIFICATION SYSTEM ───────────────────────────
 const notifs=[];
 let unreadCount=0;
-
+ 
 function addNotif(type,title,msg){
   const n={type,title,msg,time:nowFull(),id:uid(),unread:true};
   notifs.unshift(n);
@@ -1149,12 +1186,12 @@ function addNotif(type,title,msg){
     window.showLocalNotif(ico+title, msg, type+"-"+uid());
   }
 }
-
+ 
 function updateNotifBadge(){
   const badge=document.getElementById("notif-badge");
   if(badge){badge.textContent=unreadCount;badge.className="notif-badge"+(unreadCount>0?" show":"");}
 }
-
+ 
 function renderNotifPanel(){
   const list=document.getElementById("notif-list");
   if(!list)return;
@@ -1169,7 +1206,7 @@ function renderNotifPanel(){
       '</div>';
   }).join("");
 }
-
+ 
 // Toggle notification panel
 document.getElementById("notif-btn").addEventListener("click",()=>{
   const panel=document.getElementById("notif-panel");
@@ -1181,12 +1218,12 @@ document.getElementById("notif-btn").addEventListener("click",()=>{
     renderNotifPanel();
   }
 });
-
+ 
 document.getElementById("notif-clear").addEventListener("click",()=>{
   notifs.length=0;unreadCount=0;
   updateNotifBadge();renderNotifPanel();
 });
-
+ 
 // Close notif panel on outside click
 document.addEventListener("click",e=>{
   const panel=document.getElementById("notif-panel");
@@ -1195,7 +1232,7 @@ document.addEventListener("click",e=>{
     panel.classList.remove("open");
   }
 });
-
+ 
 // ─── SEED DEFAULT DATA ─────────────────────────────
 async function seedIfEmpty(){
   try{
@@ -1221,13 +1258,13 @@ async function seedIfEmpty(){
   }catch(e){console.error("Seed error:",e);}
 }
 seedIfEmpty();
-
+ 
 // ─── COMPTES INTÉGRÉS (toujours disponibles, même sans Firebase) ───
 const BUILTIN_USERS = [
   {nom:"Administrateur",login:"admin",password:"admin2024",role:"admin",poste:"DG",_docId:"b-admin"},
   {nom:"Directeur Adjoint",login:"adjoint",password:"adjoint2024",role:"admin",poste:"Adjoint DG",_docId:"b-adjoint"},
 ];
-
+ 
 // ─── LOGIN ─────────────────────────────────────────
 async function doLogin(){
   const login=document.getElementById("li-user").value.trim().toLowerCase();
@@ -1235,7 +1272,7 @@ async function doLogin(){
   const err=document.getElementById("li-err");
   err.classList.remove("show");
   if(!login||!pass){err.textContent="Remplissez tous les champs";err.classList.add("show");return;}
-
+ 
   // Vérifier comptes intégrés en premier (marche toujours)
   const builtin=BUILTIN_USERS.find(u=>u.login===login&&u.password===pass);
   if(builtin){
@@ -1246,7 +1283,7 @@ async function doLogin(){
     setTimeout(function(){ if(window.askNotifPermission) askNotifPermission(); }, 2000);
     return;
   }
-
+ 
   // Vérifier comptes Firebase
   try{
     const snap=await getDocs(collection(db,"employes"));
@@ -1280,11 +1317,11 @@ async function doLogin(){
     }
   }catch(e){err.textContent="Erreur Firebase - veuillez reessayer";err.classList.add("show");console.error(e);}
 }
-
+ 
 document.getElementById("li-btn").addEventListener("click",doLogin);
 document.getElementById("li-user").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("li-pass").focus();});
 document.getElementById("li-pass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
-
+ 
 function logout(){
   currentUser=null;
   vdSelection={};vdClientId=null;vdClientNom="";
@@ -1297,7 +1334,7 @@ function logout(){
 ["admin-logout","vd-logout","stk-logout","liv-logout"].forEach(id=>{
   document.getElementById(id).addEventListener("click",logout);
 });
-
+ 
 // ─── ADMIN TABS ────────────────────────────────────
 document.querySelectorAll(".nav-tab").forEach(tab=>{
   tab.addEventListener("click",()=>{
@@ -1307,7 +1344,7 @@ document.querySelectorAll(".nav-tab").forEach(tab=>{
     document.getElementById("tab-"+tab.dataset.tab).classList.add("active");
   });
 });
-
+ 
 // ─── RENDER ADMIN ──────────────────────────────────
 function renderAdmin(){
   renderKPIs();
@@ -1319,7 +1356,7 @@ function renderAdmin(){
   renderLivraisonsAdmin();
   renderDashMini();
 }
-
+ 
 function renderKPIs(){
   const totalCA=cache.commandes.filter(c=>c.statut==="Validée").reduce((s,c)=>{
     return s+(c.lignes||[]).reduce((ss,l)=>ss+(Number(l.quantite)||0)*(Number(l.prix_unit)||0),0);
@@ -1342,7 +1379,7 @@ function renderKPIs(){
     '<div class="kpi kb"><div class="kpi-lbl">Stock total</div><div class="kpi-val">'+fmt(totalStk)+'</div><div class="kpi-sub">'+cache.produits.length+' références · '+cache.clients.length+' clients</div></div>'+
     '<div class="kpi ky"><div class="kpi-lbl">En attente</div><div class="kpi-val">'+cmdAtt+'</div><div class="kpi-sub">Cmds + '+cache.stocks.filter(s=>!s.statut||s.statut==="en_attente").length+' stocks</div></div>';
 }
-
+ 
 function renderDashMini(){
   const dc=document.getElementById("dash-cmds");
   if(dc)dc.innerHTML=cache.commandes.slice(0,5).map(c=>
@@ -1351,23 +1388,23 @@ function renderDashMini(){
     '<td class="mono" style="color:#22c55e">'+fmt((c.lignes||[]).reduce((s,l)=>s+(Number(l.quantite)||0)*(Number(l.prix_unit)||0),0))+' F</td>'+
     '<td>'+bdg(c.statut)+'</td></tr>'
   ).join("");
-
+ 
   const ds=document.getElementById("dash-stk");
   if(ds)ds.innerHTML=cache.produits.filter(p=>Number(p.stock_qte)<=Number(p.stock_min)*2).slice(0,5).map(p=>
     '<tr><td>'+esc(p.nom||"?")+'</td><td>'+stkBar(p.stock_qte,p.stock_min)+'</td><td class="mono">'+p.stock_min+'</td></tr>'
   ).join("") || '<tr><td colspan="3" class="ep">Aucun stock critique</td></tr>';
-
+ 
   const dcl=document.getElementById("dash-cli");
   if(dcl)dcl.innerHTML=cache.clients.slice(0,5).map(c=>
     '<tr><td>'+esc(c.nom||"?")+'</td><td>'+esc(c.ville||"—")+'</td><td class="mono">'+cliCmds(c.nom)+'</td></tr>'
   ).join("") || '<tr><td colspan="3" class="ep">Aucun client</td></tr>';
-
+ 
   const dsi=document.getElementById("dash-stk-in");
   if(dsi)dsi.innerHTML=cache.stocks.slice(0,5).map(s=>
     '<tr><td>'+esc(s.produit_nom||"?")+'</td><td class="mono">'+s.casiers+'</td><td class="mono">'+fmt(s.prix_achat)+' F</td><td>'+esc(s.par||"?")+'</td></tr>'
   ).join("") || '<tr><td colspan="4" class="ep">Aucune entrée</td></tr>';
 }
-
+ 
 function renderCommandes(){
   const filtered=cmdFilter==="tous"?cache.commandes:cache.commandes.filter(c=>{
     if(cmdFilter==="en_attente")return c.statut==="en_attente"||c.statut==="En attente";
@@ -1376,7 +1413,7 @@ function renderCommandes(){
   const el=document.getElementById("commandes-list");
   if(!el)return;
   if(!filtered.length){el.innerHTML='<div class="ep">Aucune commande</div>';return;}
-
+ 
   el.innerHTML=filtered.map(c=>{
     const isAtt=c.statut==="en_attente"||c.statut==="En attente";
     const tot=(c.lignes||[]).reduce((s,l)=>s+(Number(l.quantite)||0)*(Number(l.prix_unit)||0),0);
@@ -1403,7 +1440,7 @@ function renderCommandes(){
       '</div>';
   }).join("");
 }
-
+ 
 function renderProduits(){
   const tb=document.getElementById("tb-produits");
   if(!tb)return;
@@ -1425,7 +1462,7 @@ function renderProduits(){
       '</tr>';
   }).join("");
 }
-
+ 
 function renderClients(){
   const tb=document.getElementById("tb-clients");
   if(!tb)return;
@@ -1445,7 +1482,7 @@ function renderClients(){
       '</tr>';
   }).join("");
 }
-
+ 
 function renderEmployes(){
   const tb=document.getElementById("tb-employes");
   if(!tb)return;
@@ -1466,7 +1503,7 @@ function renderEmployes(){
       '</tr>';
   }).join("");
 }
-
+ 
 function renderStocksUI(){
   // Pending stocks
   const pending=cache.stocks.filter(s=>!s.statut||s.statut==="en_attente");
@@ -1476,7 +1513,7 @@ function renderStocksUI(){
   const tabBadge=document.getElementById("tab-stk-badge");
   if(pcnt)pcnt.textContent=pending.length;
   if(tabBadge)tabBadge.style.display=pending.length>0?"inline-flex":"none";
-
+ 
   if(pendingEl){
     if(!pending.length){pendingEl.innerHTML='<div style="padding:16px;text-align:center;color:var(--mu);font-size:13px">Aucune entrée en attente</div>';
     } else {
@@ -1504,7 +1541,7 @@ function renderStocksUI(){
       }).join("");
     }
   }
-
+ 
   // Validated history table
   const tb=document.getElementById("tb-stocks");
   if(!tb)return;
@@ -1518,7 +1555,7 @@ function renderStocksUI(){
     '<td>'+esc(s.par||"?")+'</td>'+
     '<td><span class="bdg bg">Validée</span></td>'+
     '</tr>').join("");
-
+ 
   // Bénéfice net calculation
   const CA=cache.commandes.filter(c=>c.statut==="Validée").reduce((s,c)=>s+(c.lignes||[]).reduce((ss,l)=>ss+(Number(l.quantite)||0)*(Number(l.prix_unit)||0),0),0);
   const coutAchat=validated.reduce((s,st)=>s+(Number(st.casiers)||0)*(Number(st.prix_achat)||0),0);
@@ -1531,9 +1568,9 @@ function renderStocksUI(){
       '<div class="kpi '+(benef>=0?"kg":"kr")+'"><div class="kpi-lbl">Bénéfice Net</div><div class="kpi-val" style="color:'+(benef>=0?"#00d084":"#ff4757")+'">'+fmt(benef)+' F</div></div>'+
     '</div>';
 }
-
+ 
 function renderStocksHistory(){renderStocksUI();}
-
+ 
 function renderLivraisonsAdmin(){
   const el=document.getElementById("livraisons-list");
   if(!el)return;
@@ -1544,19 +1581,19 @@ function renderLivraisonsAdmin(){
     '</div>'
   ).join("");
 }
-
+ 
 // ─── CMD FILTER ────────────────────────────────────
 document.querySelectorAll("[data-cmd-filter]").forEach(btn=>{
   btn.addEventListener("click",()=>{cmdFilter=btn.dataset.cmdFilter;renderCommandes();});
 });
-
+ 
 // ─── EVENT DELEGATION ──────────────────────────────
 document.addEventListener("click",async function(e){
   const t=e.target.closest("[data-action]");
   if(!t)return;
   const action=t.dataset.action;
   const id=t.dataset.id;
-
+ 
   // COMMANDES
   if(action==="validate-cmd"){
     try{
@@ -1597,7 +1634,7 @@ document.addEventListener("click",async function(e){
     catch(e2){toast("❌ "+e2.message);}
     return;
   }
-
+ 
   // PRODUITS
   if(action==="edit-prod"){
     const p=cache.produits.find(x=>x._docId===id);
@@ -1619,7 +1656,7 @@ document.addEventListener("click",async function(e){
     catch(e2){toast("❌ "+e2.message);}
     return;
   }
-
+ 
   // CLIENTS
   if(action==="edit-cli"){
     const c=cache.clients.find(x=>x._docId===id);
@@ -1638,7 +1675,7 @@ document.addEventListener("click",async function(e){
     catch(e2){toast("❌ "+e2.message);}
     return;
   }
-
+ 
   // STOCKS
   if(action==="validate-stk"){
     const s=cache.stocks.find(x=>x._docId===id);
@@ -1669,7 +1706,7 @@ document.addEventListener("click",async function(e){
     }catch(e2){toast("❌ "+e2.message);}
     return;
   }
-
+ 
   // EMPLOYES
   if(action==="edit-emp"){
     const e=cache.employes.find(x=>x._docId===id);
@@ -1693,7 +1730,7 @@ document.addEventListener("click",async function(e){
     return;
   }
 });
-
+ 
 // ─── ADD BUTTONS ───────────────────────────────────
 document.getElementById("btn-add-prod").addEventListener("click",()=>{
   editDocId.prod=null;
@@ -1702,14 +1739,14 @@ document.getElementById("btn-add-prod").addEventListener("click",()=>{
   document.getElementById("mp-four").value="SOBEBRA";
   openModal("prod");
 });
-
+ 
 document.getElementById("btn-add-cli").addEventListener("click",()=>{
   editDocId.cli=null;
   document.getElementById("modal-cli-ttl").textContent="Nouveau Client";
   ["mc-nom","mc-tel","mc-ville"].forEach(id=>document.getElementById(id).value="");
   openModal("cli");
 });
-
+ 
 document.getElementById("btn-add-emp").addEventListener("click",()=>{
   editDocId.emp=null;
   document.getElementById("modal-emp-ttl").textContent="Nouvel Employé";
@@ -1718,7 +1755,7 @@ document.getElementById("btn-add-emp").addEventListener("click",()=>{
   document.getElementById("me-statut").value="Actif";
   openModal("emp");
 });
-
+ 
 // ─── SAVE MODALS ───────────────────────────────────
 document.getElementById("mp-save").addEventListener("click",async()=>{
   const nom=document.getElementById("mp-nom").value.trim();
@@ -1738,7 +1775,7 @@ document.getElementById("mp-save").addEventListener("click",async()=>{
     closeModal("prod");toast("✅ Produit enregistré");
   }catch(e){toast("❌ "+e.message);}
 });
-
+ 
 document.getElementById("mc-save").addEventListener("click",async()=>{
   const nom=document.getElementById("mc-nom").value.trim();
   if(!nom){toast("⚠️ Nom obligatoire");return;}
@@ -1753,7 +1790,7 @@ document.getElementById("mc-save").addEventListener("click",async()=>{
     closeModal("cli");toast("✅ Client enregistré");
   }catch(e){toast("❌ "+e.message);}
 });
-
+ 
 document.getElementById("me-save").addEventListener("click",async()=>{
   const nom=document.getElementById("me-nom").value.trim();
   const login=document.getElementById("me-login").value.trim().toLowerCase();
@@ -1773,7 +1810,7 @@ document.getElementById("me-save").addEventListener("click",async()=>{
     closeModal("emp");toast("✅ Employé enregistré");
   }catch(e){toast("❌ "+e.message);}
 });
-
+ 
 // ─── LIVREUR ───────────────────────────────────────
 document.getElementById("btn-add-liv").addEventListener("click",()=>{
   // Populate commandes dropdown
@@ -1785,7 +1822,7 @@ document.getElementById("btn-add-liv").addEventListener("click",()=>{
   ["ml-client","ml-details"].forEach(id=>document.getElementById(id).value="");
   openModal("liv");
 });
-
+ 
 document.getElementById("ml-save").addEventListener("click",async()=>{
   const client=document.getElementById("ml-client").value.trim();
   const details=document.getElementById("ml-details").value.trim();
@@ -1803,7 +1840,7 @@ document.getElementById("ml-save").addEventListener("click",async()=>{
     }
   }catch(e){toast("❌ "+e.message);}
 });
-
+ 
 function renderLivreurList(){
   const el=document.getElementById("liv-list");
   if(!el)return;
@@ -1815,12 +1852,12 @@ function renderLivreurList(){
     '</div>'
   ).join("");
 }
-
+ 
 // ─── VENDEUR — CLIENT AUTOCOMPLETE ─────────────────
 const vdInp=document.getElementById("vd-client-inp");
 const vdDd=document.getElementById("vd-cli-dd");
 const vdCliInfo=document.getElementById("vd-client-info");
-
+ 
 vdInp.addEventListener("input",function(){
   const q=(this.value||"").trim().toLowerCase();
   vdClientId=null;vdClientNom=this.value.trim();
@@ -1839,7 +1876,7 @@ vdInp.addEventListener("input",function(){
   vdDd.innerHTML=html;
   vdDd.classList.toggle("show",html.length>0);
 });
-
+ 
 vdDd.addEventListener("click",function(e){
   const opt=e.target.closest(".cli-opt");
   if(!opt)return;
@@ -1861,11 +1898,11 @@ vdDd.addEventListener("click",function(e){
   }
   vdDd.classList.remove("show");
 });
-
+ 
 document.addEventListener("click",function(e){
   if(!vdDd.contains(e.target)&&e.target!==vdInp)vdDd.classList.remove("show");
 });
-
+ 
 // ─── VENDEUR — PRODUITS GRID ───────────────────────
 function renderVendeurGrid(){
   const grid=document.getElementById("vd-prod-grid");
@@ -1890,7 +1927,7 @@ function renderVendeurGrid(){
       '</div>'+
       '</div>';
   }).join("");
-
+ 
   // Tile click
   grid.querySelectorAll(".prod-tile").forEach(tile=>{
     tile.addEventListener("click",()=>{
@@ -1910,7 +1947,7 @@ function renderVendeurGrid(){
       updateVdRecap();
     });
   });
-
+ 
   // QTE +/- buttons
   grid.querySelectorAll("[data-qte-action]").forEach(btn=>{
     btn.addEventListener("click",e=>{
@@ -1924,7 +1961,7 @@ function renderVendeurGrid(){
       if(vdSelection[id]){vdSelection[id].qte=v;updateVdRecap();}
     });
   });
-
+ 
   // QTE input change
   grid.querySelectorAll(".qte-inp").forEach(inp=>{
     inp.addEventListener("input",()=>{
@@ -1935,7 +1972,7 @@ function renderVendeurGrid(){
     });
   });
 }
-
+ 
 function updateVdRecap(){
   const ids=Object.keys(vdSelection);
   const rc=document.getElementById("vd-recap-card");
@@ -1954,7 +1991,7 @@ function updateVdRecap(){
   document.getElementById("vd-recap-lines").innerHTML=lines.join("");
   document.getElementById("vd-recap-total").textContent=fmt(total)+" F";
 }
-
+ 
 // ─── VENDEUR — SUBMIT ──────────────────────────────
 document.getElementById("vd-submit").addEventListener("click",async()=>{
   const client=vdClientNom.trim()||vdInp.value.trim();
@@ -1963,13 +2000,13 @@ document.getElementById("vd-submit").addEventListener("click",async()=>{
   if(!client){toast("⚠️ Entrez le nom du client");vdInp.focus();return;}
   if(!Object.keys(vdSelection).length){toast("⚠️ Sélectionnez au moins un produit");return;}
   if(!paiement){toast("⚠️ Sélectionnez le mode de paiement");return;}
-
+ 
   // Sync qtés depuis les inputs
   Object.keys(vdSelection).forEach(id=>{
     const el=document.getElementById("qi-"+id);
     if(el)vdSelection[id].qte=Math.max(1,Number(el.value)||1);
   });
-
+ 
   const lignes=Object.values(vdSelection).map(s=>({
     produit_id:s.prod._docId,
     produit_nom:s.prod.nom||"?",
@@ -1978,7 +2015,7 @@ document.getElementById("vd-submit").addEventListener("click",async()=>{
     subtotal:s.qte*(s.prod.prix_unit||0)
   }));
   const montant=lignes.reduce((s,l)=>s+l.subtotal,0);
-
+ 
   const btn=document.getElementById("vd-submit");
   btn.disabled=true;btn.textContent="Envoi...";
   try{
@@ -2000,7 +2037,7 @@ document.getElementById("vd-submit").addEventListener("click",async()=>{
   }catch(e2){toast("❌ Erreur: "+e2.message);}
   btn.disabled=false;btn.textContent="📤 Envoyer la commande";
 });
-
+ 
 document.getElementById("vd-new-cmd").addEventListener("click",()=>{
   document.getElementById("vd-form").style.display="block";
   document.getElementById("vd-success").style.display="none";
@@ -2014,7 +2051,7 @@ document.getElementById("vd-new-cmd").addEventListener("click",()=>{
   document.querySelectorAll(".qte-inp").forEach(inp=>{inp.value=1;});
   vdSelection={};
 });
-
+ 
 // ─── STOCK — FORM ──────────────────────────────────
 function renderStockForm(){
   const rows=document.getElementById("stk-prod-rows");
@@ -2038,7 +2075,7 @@ function renderStockForm(){
       '</div>';
   }).join("");
 }
-
+ 
 document.getElementById("stk-submit").addEventListener("click",async()=>{
   const entries=[];
   for(const p of cache.produits){
@@ -2077,40 +2114,40 @@ document.getElementById("stk-submit").addEventListener("click",async()=>{
   }catch(e){toast("❌ Erreur: "+e.message);}
   btn.disabled=false;btn.textContent="📦 Enregistrer l'entrée stock";
 });
-
+ 
 document.getElementById("stk-new").addEventListener("click",()=>{
   document.getElementById("stk-form").style.display="block";
   document.getElementById("stk-success").style.display="none";
   document.querySelectorAll(".stock-qte-inp").forEach(inp=>{inp.value=0;});
   document.querySelectorAll(".stock-prod-row").forEach(r=>r.classList.remove("has-val"));
 });
-
+ 
 </script>
-
+ 
 <script>
 // ══════════════════════════════════════════════
 // SERVICE WORKER + NOTIFICATIONS NATIVES
 // ══════════════════════════════════════════════
-
+ 
 var SGF_SW_URL = null;
-
+ 
 (function(){
   if(!("serviceWorker" in navigator)) return;
   // N'enregistre le SW que sur http/https (pas dans les iframes sandboxées)
   if(location.protocol !== 'http:' && location.protocol !== 'https:') return;
-
+ 
   // Service Worker code with notification support
   var swCode = `
     const CACHE_NAME = "sgf-cache-v2";
-
+ 
     self.addEventListener("install", function(e){
       self.skipWaiting();
     });
-
+ 
     self.addEventListener("activate", function(e){
       e.waitUntil(clients.claim());
     });
-
+ 
     self.addEventListener("fetch", function(e){
       // Cache-first for same-origin
       if(e.request.url.startsWith(self.location.origin)){
@@ -2127,7 +2164,7 @@ var SGF_SW_URL = null;
         );
       }
     });
-
+ 
     // NOTIFICATION CLICK — ouvre l'app
     self.addEventListener("notificationclick", function(e){
       e.notification.close();
@@ -2140,30 +2177,34 @@ var SGF_SW_URL = null;
         })
       );
     });
-
+ 
     // RECEIVE PUSH MESSAGE
     self.addEventListener("push", function(e){
       var data = e.data ? e.data.json() : {};
       e.waitUntil(
         self.registration.showNotification(data.title || "SGF", {
           body: data.body || "",
-          icon: data.icon || "./icon-192x192.png",
-          badge: "./icon-72x72.png",
+          icon: data.icon || (self._SGF_ICON_192 || "./icon-192x192.png"),
+          badge: (self._SGF_ICON_72 || "./icon-72x72.png"),
           vibrate: [200, 100, 200],
           data: data,
           actions: [{action:"open", title:"Ouvrir SGF"}]
         })
       );
     });
-
+ 
     // SHOW LOCAL NOTIFICATION (called from main thread via postMessage)
     self.addEventListener("message", function(e){
+      if(e.data && e.data.type === "SET_ICONS"){
+        self._SGF_ICON_192 = e.data.icon192;
+        self._SGF_ICON_72  = e.data.icon72;
+      }
       if(e.data && e.data.type === "SHOW_NOTIF"){
         var d = e.data;
         self.registration.showNotification(d.title, {
           body: d.body,
-          icon: "./icon-192x192.png",
-          badge: "./icon-72x72.png",
+          icon: self._SGF_ICON_192 || "./icon-192x192.png",
+          badge: self._SGF_ICON_72  || "./icon-72x72.png",
           vibrate: [150, 80, 150],
           tag: d.tag || "sgf-notif",
           renotify: true,
@@ -2173,14 +2214,22 @@ var SGF_SW_URL = null;
       }
     });
   `;
-
+ 
   var blob = new Blob([swCode], {type:"application/javascript"});
   SGF_SW_URL = URL.createObjectURL(blob);
-
+ 
   navigator.serviceWorker.register(SGF_SW_URL)
     .then(function(reg){
       console.log("SGF SW registered");
       window._sgfSW = reg;
+      // Passer les icônes inline au SW
+      if(navigator.serviceWorker.controller && window._SGF_ICON_192){
+        navigator.serviceWorker.controller.postMessage({
+          type:"SET_ICONS",
+          icon192: window._SGF_ICON_192,
+          icon72:  window._SGF_ICON_72
+        });
+      }
       // Request notification permission on first visit
       if(Notification.permission === "default"){
         setTimeout(function(){ askNotifPermission(); }, 5000);
@@ -2188,13 +2237,13 @@ var SGF_SW_URL = null;
     })
     .catch(function(e){ console.log("SW error:", e); });
 })();
-
+ 
 // ── ASK NOTIFICATION PERMISSION ──────────────────
 function askNotifPermission(){
   if(!("Notification" in window)) return;
   if(Notification.permission === "granted") return;
   if(Notification.permission === "denied") return;
-
+ 
   // Show custom prompt first
   var box = document.createElement("div");
   box.id = "notif-perm-box";
@@ -2216,7 +2265,7 @@ function askNotifPermission(){
     '</div></div>'
   ].join("");
   document.body.appendChild(box);
-
+ 
   document.getElementById("np-yes").addEventListener("click", function(){
     Notification.requestPermission().then(function(perm){
       if(perm === "granted"){
@@ -2227,12 +2276,12 @@ function askNotifPermission(){
   });
   document.getElementById("np-no").addEventListener("click", function(){ box.remove(); });
 }
-
+ 
 // ── SEND LOCAL NOTIFICATION ───────────────────────
 function showLocalNotif(title, body, tag){
   if(!("Notification" in window)) return;
   if(Notification.permission !== "granted") return;
-
+ 
   // Send via service worker for proper click handling
   if(navigator.serviceWorker.controller){
     navigator.serviceWorker.controller.postMessage({
@@ -2240,11 +2289,11 @@ function showLocalNotif(title, body, tag){
     });
   } else {
     // Fallback: direct notification
-    try{ new Notification(title, {body:body, icon:"./icon-192x192.png", vibrate:[150,80,150]}); }
+    try{ new Notification(title, {body:body, icon:window._SGF_ICON_192||"./icon-192x192.png", vibrate:[150,80,150]}); }
     catch(e){}
   }
 }
-
+ 
 // Make globally accessible
 window.showLocalNotif = showLocalNotif;
 window.askNotifPermission = askNotifPermission;
